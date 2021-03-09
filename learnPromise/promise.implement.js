@@ -75,7 +75,7 @@ class CustomPromise {
       }
     });
   }
-}
+} 
 
 const createPromise = function (number) {
   return new CustomPromise((resolve, reject) => {

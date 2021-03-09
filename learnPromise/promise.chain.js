@@ -38,4 +38,4 @@ async function main(){
     console.log('for of async end', new Date().getTime());
 }
 
-main();
+main(); 
