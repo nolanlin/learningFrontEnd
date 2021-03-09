@@ -21,6 +21,7 @@ class CustomPromise {
     this.rejectedList = [];
     handleFunc(this.triggerResolve.bind(this));
   }
+  
   triggerResolve(val) {
     if (this.state !== 'pending') return;
     setTimeout(() => {
@@ -30,6 +31,7 @@ class CustomPromise {
       this.fulfilledList = [];
     }, 0);
   }
+
   then(onFulfilled, onRejected){
     const { state, value, reason } = this
     return new CustomPromise((nextResolve, nextReject) => {
@@ -52,6 +54,26 @@ class CustomPromise {
         }
       }
     })
+  }
+
+  static all(list) {
+    return new CustomPromise((resolve, reject) => {
+      let count = 0;
+      const values = [];
+      for (const [i, customPromiseInstance] of list.entries()) {
+        customPromiseInstance
+          .then(
+            res => {
+              values[i] = res;
+              count++;
+              if (count === list.length) resolve(values);
+            },
+            err => {
+              reject(err);
+            }
+          )
+      }
+    });
   }
 }
 
