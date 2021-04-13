@@ -36,8 +36,15 @@
 > *If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.*
 6. then 必须返回promise，以下简称为promise2
 > `promise2 = promise1.then(onFulfilled, onRejected);`
-- onFulfilled, onRejected 正常返回x，执行*the Promise Resolution Procedure*这段处理逻辑
+- onFulfilled, onRejected 正常返回x，执行*the Promise Resolution Procedure*这段处理逻辑（也就是，有正常的return）
 > *If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x)*
 - onFulfilled, onRejected 抛异常，则promise2的状态是rejected且带有reason
 - onFulfilled 非函数且promise1状态是fulfilled，则promise2的状态是fulfilled带有promise1的value
 - onRejected 非函数且promise1状态是rejected，则promise2的状态是rejected带有promise1的reason
+
+##### The Promise Resolution Procedure
+`[[Resolve]](promise2, x)` （promise2是then的返回值，x是onFulfilled或onRejected的返回值）
+> *The promise resolution procedure is an abstract operation taking as input a promise and a value, which we denote as [[Resolve]](promise, x)*
+1. 若promise2和x相等，则promise2为rejected，reason是TypeError
+**（什么情况会触发promise2和x相等？）**
+2. 
