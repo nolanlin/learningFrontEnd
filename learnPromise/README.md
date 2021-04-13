@@ -18,9 +18,9 @@
 #### 规范
 ##### 状态
 1. 三个状态：pending, fulfilled, rejected
-2. 状态流转（fulfilled,rejected为最终态，不可变）：
-- **pending -> resolve(value) -> fulfilled**
-- **pending -> reject(reason) -> rejected**
+2. 状态流转（**fulfilled,rejected为最终态，不可变**）：
+- pending -> resolve(value) -> fulfilled
+- pending -> reject(reason) -> rejected
 
 
 ##### then方法
