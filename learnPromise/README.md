@@ -18,11 +18,11 @@
 #### 规范
 ##### 状态
 1. 三个状态：pending, fulfilled, rejected
-2. 状态流转：
-pending -> resolve(value) -> fulfilled *最终态，不可变*
-pending -> reject(reason) -> rejected *最终态，不可变*
+2. 状态流转（fulfilled,rejected为最终态，不可变）：
+**pending -> resolve(value) -> fulfilled** 
+**pending -> reject(reason) -> rejected** 
+
 
 ##### then方法
-(```)
-promise.then(onFulfilled, onRejected)
-(```)
+`promise.then(onFulfilled, onRejected)`
+
