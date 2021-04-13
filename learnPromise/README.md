@@ -43,8 +43,11 @@
 - onRejected 非函数且promise1状态是rejected，则promise2的状态是rejected带有promise1的reason
 
 ##### The Promise Resolution Procedure
-`[[Resolve]](promise2, x)` （promise2是then的返回值，x是onFulfilled或onRejected的返回值）
+`[[Resolve]](promise2, x)` 
 > *The promise resolution procedure is an abstract operation taking as input a promise and a value, which we denote as [[Resolve]](promise, x)*
 1. 若promise2和x相等，则promise2为rejected，reason是TypeError
 **（什么情况会触发promise2和x相等？）**
-2. 
+2. 若x是promise，那就得看此时x的状态：
+- x是pending，则promise2必须保持pending直到x是fulfilled或rejected
+- x是fulfilled，则fulfill promise2 with the same value
+- x是rejected，则reject promise2 with the same reason
