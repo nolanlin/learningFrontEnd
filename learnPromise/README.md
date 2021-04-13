@@ -7,5 +7,5 @@
 ## 知识要点
 
 ### Promise
-[PromiseA+规范][https://promisesaplus.com/]
+[PromiseA+规范](https://promisesaplus.com/)
 #### 术语
