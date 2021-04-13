@@ -25,4 +25,9 @@
 
 ##### then方法
 `promise.then(onFulfilled, onRejected)`
-
+1. onFulfilled, onRejected 忽略非函数类型
+2. 当且仅当promise变成fulfilled时，才可调用onFulfilled，value是参数，且onFulfilled仅可被调用1次
+3. 当且仅当promise变成rejected时，才可调用onRejected，reason是参数，且onRejected仅可被调用1次
+4. onFulfilled, onRejected 应当是微任务（queueMicrotask）
+> *onFulfilled or onRejected must not be called until the execution context stack contains only platform code*
+5. 
