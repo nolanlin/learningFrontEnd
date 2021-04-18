@@ -51,3 +51,16 @@
 - x是pending，则promise2必须保持pending直到x是fulfilled或rejected
 - x是fulfilled，则fulfill promise2 with the same value
 - x是rejected，则reject promise2 with the same reason
+3. 若x是对象或函数：
+- Let then be x.then
+- 若x.then抛出异常e，那么reject promise with e as the reason
+- 若then是函数，那么then.call(x, resolvePromiseFn, rejectPromiseFn)，相当于x.then(resolvePromiseFn, rejectPromiseFn)，有以下情况：
+> *If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise*
+- 3.1. 若resolvePromise被唤起，入参是value y，那么运行[[Resolve]](promise, y)
+> *If/when resolvePromise is called with a value y, run [[Resolve]](promise, y)*
+- 3.2. 若rejectPromise被唤起，入参是reason r，那么reject promise with r
+> *If/when rejectPromise is called with a reason r, reject promise with r*
+- 3.3. 若resolvePromise和rejectPromise都被唤起，或多次用同个参数唤起，则第一次唤起优先，其他忽略。
+- 3.4. 若then抛出异常e，若resolvePromise或rejectPromise已经被唤起，则忽略异常。其他情况，则reject promise with e as the reason
+- 3.5. 若then不是一个函数，则fulfill promise with x
+4. 若x不是对象或函数，则fulfill promise with x
