@@ -23,44 +23,46 @@
 - pending -> reject(reason) -> rejected
 
 ##### then方法
-`promise.then(onFulfilled, onRejected)`
+###### `promise.then(onFulfilled, onRejected)`
 1. onFulfilled, onRejected 忽略非函数类型（第6点继续解释）
 2. 当且仅当promise变成fulfilled时，才可调用onFulfilled，value是参数，且onFulfilled仅可被调用1次
 3. 当且仅当promise变成rejected时，才可调用onRejected，reason是参数，且onRejected仅可被调用1次
 4. onFulfilled, onRejected 应当是微任务（queueMicrotask）
-> *onFulfilled or onRejected must not be called until the execution context stack contains only platform code*
+  > *onFulfilled or onRejected must not be called until the execution context stack contains only platform code*
 5. then 可被多次调用
-- 所有onFulfilled, onRejected回调按照then的注册顺序依次执行
-> *If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their originating calls to then.*
-> *If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.*
+    - 所有onFulfilled, onRejected回调按照then的注册顺序依次执行
+    > *If/when promise is fulfilled, all respective onFulfilled callbacks must execute in the order of their originating calls to then.*
+    > *If/when promise is rejected, all respective onRejected callbacks must execute in the order of their originating calls to then.*
 6. then 必须返回promise，以下简称为promise2
-> `promise2 = promise1.then(onFulfilled, onRejected);`
-- onFulfilled, onRejected 正常返回x，执行*the Promise Resolution Procedure*这段处理逻辑（也就是，有正常的return）
-> *If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x)*
-- onFulfilled, onRejected 抛异常，则promise2的状态是rejected且带有reason
-- onFulfilled 非函数且promise1状态是fulfilled，则promise2的状态是fulfilled带有promise1的value
-- onRejected 非函数且promise1状态是rejected，则promise2的状态是rejected带有promise1的reason
+  > `promise2 = promise1.then(onFulfilled, onRejected);`
+  - onFulfilled, onRejected 正常返回x，执行*the Promise Resolution Procedure*这段处理逻辑（也就是，有正常的return）
+    > *If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x)*
+  - onFulfilled, onRejected 抛异常，则promise2的状态是rejected且带有reason
+  - onFulfilled 非函数且promise1状态是fulfilled，则promise2的状态是fulfilled带有promise1的value
+  - onRejected 非函数且promise1状态是rejected，则promise2的状态是rejected带有promise1的reason
 
 ##### The Promise Resolution Procedure
-`[[Resolve]](promise2, x)` 
+###### `[[Resolve]](promise2, x)` 
 > *The promise resolution procedure is an abstract operation taking as input a promise and a value, which we denote as [[Resolve]](promise, x)*
+<br>  
+
 1. 若promise2和x相等，则promise2为rejected，reason是TypeError
 2. 若x是promise，那就得看此时x的状态：
-- x是pending，则promise2必须保持pending直到x是fulfilled或rejected
-- x是fulfilled，则fulfill promise2 with the same value
-- x是rejected，则reject promise2 with the same reason
+  - x是pending，则promise2必须保持pending直到x是fulfilled或rejected
+  - x是fulfilled，则fulfill promise2 with the same value
+  - x是rejected，则reject promise2 with the same reason
 3. 若x是对象或函数：
-- Let then be x.then
-- 若x.then抛出异常e，那么reject promise with e as the reason
-- 若then是函数，那么then.call(x, resolvePromiseFn, rejectPromiseFn)，相当于x.then(resolvePromiseFn, rejectPromiseFn)，有以下情况：
-> *If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise*
-- 3.1. 若resolvePromise被唤起，入参是value y，那么运行[[Resolve]](promise, y)
-> *If/when resolvePromise is called with a value y, run [[Resolve]](promise, y)*
-- 3.2. 若rejectPromise被唤起，入参是reason r，那么reject promise with r
-> *If/when rejectPromise is called with a reason r, reject promise with r*
-- 3.3. 若resolvePromise和rejectPromise都被唤起，或多次用同个参数唤起，则第一次唤起优先，其他忽略。
-- 3.4. 若then抛出异常e，若resolvePromise或rejectPromise已经被唤起，则忽略异常。其他情况，则reject promise with e as the reason
-- 3.5. 若then不是一个函数，则fulfill promise with x
+  - Let then be x.then
+  - 若x.then抛出异常e，那么reject promise with e as the reason
+  - 若then是函数，那么then.call(x, resolvePromiseFn, rejectPromiseFn)，相当于x.then(resolvePromiseFn, rejectPromiseFn)，有以下情况：
+    > *If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise*
+  - 3.1. 若resolvePromise被唤起，入参是value y，那么运行[[Resolve]](promise, y)
+    > *If/when resolvePromise is called with a value y, run [[Resolve]](promise, y)*
+  - 3.2. 若rejectPromise被唤起，入参是reason r，那么reject promise with r
+    > *If/when rejectPromise is called with a reason r, reject promise with r*
+  - 3.3. 若resolvePromise和rejectPromise都被唤起，或多次用同个参数唤起，则第一次唤起优先，其他忽略。
+  - 3.4. 若then抛出异常e，若resolvePromise或rejectPromise已经被唤起，则忽略异常。其他情况，则reject promise with e as the reason
+  - 3.5. 若then不是一个函数，则fulfill promise with x
 4. 若x不是对象或函数，则fulfill promise with x
 
 ### Generator
