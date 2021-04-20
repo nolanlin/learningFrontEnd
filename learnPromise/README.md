@@ -120,3 +120,100 @@ console.log(g.next()); // {value: 2, done: false}
 console.log(g.next()); // {value: undefined, done: true}
 ```
 ### async await
+#### 概念
+- Generator函数的语法糖，对Generator函数有改进：
+1. async函数的执行，与普通函数一样，不需要generator.next()
+2. async代替*号，await代替yield，语义更清楚
+3. await命令后面，可以是 Promise 对象和原始类型的值（数值、字符串和布尔值，但这时会自动转成立即 resolved 的 Promise 对象）
+4. async函数返回值是Promise对象，比Generator函数返回的Iterator对象更好用
+```js
+function sleep(interval) {
+  return new Promise(resolve => {
+    setTimeout(resolve, interval);
+  })
+}
+async function one2FiveInAsync() {
+  for(let i = 1; i <= 5; i++) {
+    console.log(i);
+    await sleep(1000);
+  }
+}
+one2FiveInAsync();
+```
+> babel编译后
+```js
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+      var info = gen[key](arg);
+      var value = info.value
+  } catch (error) {
+      reject(error);
+      return
+  }
+  if (info.done) {
+      resolve(value)
+  } else {
+      Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function() {
+      var self = this,
+          args = arguments;
+      return new Promise(function(resolve, reject) {
+          var gen = fn.apply(self, args);
+
+          function _next(value) {
+              asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+          }
+
+          function _throw(err) {
+              asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+          }
+          _next(undefined)
+      })
+  }
+}
+
+function sleep(interval) {
+  return new Promise(function(resolve) {
+      setTimeout(resolve, interval)
+  })
+}
+
+function one2FiveInAsync() {
+  return _one2FiveInAsync.apply(this, arguments)
+}
+
+function _one2FiveInAsync() {
+  _one2FiveInAsync = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      var i;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+              switch (_context.prev = _context.next) {
+                  case 0:
+                      i = 1;
+                  case 1:
+                      if (!(i <= 5)) {
+                          _context.next = 8;
+                          break
+                      }
+                      console.log(i);
+                      _context.next = 5;
+                      return sleep(1000);
+                  case 5:
+                      i++;
+                      _context.next = 1;
+                      break;
+                  case 8:
+                  case "end":
+                      return _context.stop()
+              }
+          }
+      }, _callee)
+  }));
+  return _one2FiveInAsync.apply(this, arguments)
+}
+one2FiveInAsync();
+```
