@@ -22,7 +22,6 @@
 - pending -> resolve(value) -> fulfilled
 - pending -> reject(reason) -> rejected
 
-
 ##### then方法
 `promise.then(onFulfilled, onRejected)`
 1. onFulfilled, onRejected 忽略非函数类型（第6点继续解释）
@@ -46,7 +45,6 @@
 `[[Resolve]](promise2, x)` 
 > *The promise resolution procedure is an abstract operation taking as input a promise and a value, which we denote as [[Resolve]](promise, x)*
 1. 若promise2和x相等，则promise2为rejected，reason是TypeError
-**（什么情况会触发promise2和x相等？）**
 2. 若x是promise，那就得看此时x的状态：
 - x是pending，则promise2必须保持pending直到x是fulfilled或rejected
 - x是fulfilled，则fulfill promise2 with the same value
@@ -64,3 +62,58 @@
 - 3.4. 若then抛出异常e，若resolvePromise或rejectPromise已经被唤起，则忽略异常。其他情况，则reject promise with e as the reason
 - 3.5. 若then不是一个函数，则fulfill promise with x
 4. 若x不是对象或函数，则fulfill promise with x
+
+### Generator
+```js
+function* generator() {
+    const list = [1, 2];
+    for (let i of list) {
+        yield i;
+    }
+}
+let g = generator();
+console.log(g.next()); // {value: 1, done: false}
+console.log(g.next()); // {value: 2, done: false}
+console.log(g.next()); // {value: undefined, done: true}
+```
+> babel编译后
+```js
+var _marked = /*#__PURE__*/regeneratorRuntime.mark(generator);
+function generator() {
+  var list, _i, _list, i;
+  return regeneratorRuntime.wrap(function generator$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          list = [1, 2];
+          _i = 0, _list = list;
+        case 2:
+          if (!(_i < _list.length)) {
+            _context.next = 9;
+            break;
+          }
+          i = _list[_i];
+          _context.next = 6;
+          return i;
+        case 6:
+          _i++;
+          _context.next = 2;
+          break;
+        case 9:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, _marked);
+}
+var g = generator();
+console.log(g.next()); // {value: 1, done: false}
+console.log(g.next()); // {value: 2, done: false}
+console.log(g.next()); // {value: undefined, done: true}
+```
+#### 特性
+1. 每当执行完一条yield语句后函数就会自动停止执行, 直到再次调用next();
+2. yield关键字只可在生成器内部使用，在其他地方使用会导致程序抛出错误;
+3. 可以通过函数表达式来创建生成器, 但是不能使用箭头函数
+
+### async await
