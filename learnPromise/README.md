@@ -64,6 +64,14 @@
 4. 若x不是对象或函数，则fulfill promise with x
 
 ### Generator
+#### 概念
+- 是ES6提供的一种异步编程解决方案
+- 状态机，封装了多个内部状态
+- 遍历器对象的生成函数
+#### 特性
+1. 每当执行完一条yield语句后函数就会自动停止执行, 直到再次调用next();
+2. yield关键字只可在生成器内部使用，在其他地方使用会导致程序抛出错误;
+3. 可以通过函数表达式来创建生成器, 但是不能使用箭头函数
 ```js
 function* generator() {
     const list = [1, 2];
@@ -111,9 +119,4 @@ console.log(g.next()); // {value: 1, done: false}
 console.log(g.next()); // {value: 2, done: false}
 console.log(g.next()); // {value: undefined, done: true}
 ```
-#### 特性
-1. 每当执行完一条yield语句后函数就会自动停止执行, 直到再次调用next();
-2. yield关键字只可在生成器内部使用，在其他地方使用会导致程序抛出错误;
-3. 可以通过函数表达式来创建生成器, 但是不能使用箭头函数
-
 ### async await
