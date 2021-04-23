@@ -116,10 +116,20 @@
 ###### Promise 的串行执行
 
 ```js
+const promise1 = Promise.resolve(1);
+const promise2 = Promise.resolve(2);
 const promiseArray = [promise1, promise2];
+// Array.prototype.reduce()
 const promiseReduce = promiseArray.reduce((prev, curr) => {
   return prev.then(curr);
 }, Promise.resolve());
+// async await
+async function promisesResolve() {
+  for (const promiseInstance of promiseArray) {
+    await promiseInstance.then();
+  }
+}
+promisesResolve();
 ```
 
 ###### 可以取消的 promise 类
@@ -212,7 +222,7 @@ console.log(g.next()); // {value: undefined, done: true}
 #### 其他特性
 
 1. await 关键字期待（但实际上并不要求）一个实现 thenable 接口的对象，但常规的值也可以，则这个值就被当作已经 resolve 的 promise
-2. await 不能出现在 async 函数里的嵌套函数中
+2. await 不能出现在 async 函数里的嵌套函数中（无论是箭头函数、同步函数声明，还是 IIFE）
 
 ```js
 function sleep(interval) {
