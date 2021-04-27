@@ -10,7 +10,8 @@
 
 ### Promise
 
-[Promises/A+规范](https://promisesaplus.com/)
+- [Promises/A+规范](https://promisesaplus.com/)
+- [Promise 实现](https://github.com/nolanlin/learningFrontEnd/blob/main/learnPromise/promise.impl.js)
 
 #### 术语
 
