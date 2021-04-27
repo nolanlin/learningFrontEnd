@@ -48,42 +48,31 @@ class MyPromise {
     } else {
       queueMicrotask(() => {
         const promise2 = new MyPromise((resolve, reject) => {
+          let x = null;
           if (this.state === FULFILLED) {
             // onFulfilled 非函数且 promise1 状态是 fulfilled，则 promise2 的状态是 fulfilled 带有 promise1 的 value
             if (!this.isFunction(onFulfilledFn)) {
               resolve(this.value);
             }
             // onFulfilled抛异常，则 promise2 的状态是 rejected 且带有 reason
-            const onFulfilledResult = null;
             try {
-              onFulfilledResult = onFulfilledFn(this.value);
+              x = onFulfilledFn(this.value);
             } catch (e) {
               reject(e);
             }
-            this.promiseResolutionProcedure(
-              promise2,
-              onFulfilledResult,
-              resolve,
-              reject
-            );
+            this.promiseResolutionProcedure(promise2, x, resolve, reject);
           } else if (this.state === REJECTED) {
             // onRejected 非函数且 promise1 状态是 rejected，则 promise2 的状态是 rejected 带有 promise1 的 reason
             if (!this.isFunction(onRejectedFn)) {
               reject(this.reason);
             }
             // onRejected 抛异常，则 promise2 的状态是 rejected 且带有 reason
-            const onRejectedResult = null;
             try {
-              onRejectedResult = onRejectedFn(this.reason);
+              x = onRejectedFn(this.reason);
             } catch (e) {
               reject(e);
             }
-            this.promiseResolutionProcedure(
-              promise2,
-              onRejectedResult,
-              resolve,
-              reject
-            );
+            this.promiseResolutionProcedure(promise2, x, resolve, reject);
           }
         });
         return promise2;
