@@ -70,7 +70,7 @@
 
 - Let then be x.then
 - 若 x.then 抛出异常 e，那么 reject promise with e as the reason
-- 若 then 是函数，那么 then.call(x, resolvePromiseFn, rejectPromiseFn)，相当于 x.then(resolvePromiseFn, rejectPromiseFn)，有以下情况：
+- 若 then 是函数，那么 then.call(x, resolvePromiseFn, rejectPromiseFn)，有以下情况：
   > _If then is a function, call it with x as this, first argument resolvePromise, and second argument rejectPromise_
 - 3.1. 若 resolvePromise 被唤起，入参是 value y，那么运行[[Resolve]](promise, y)
   > _If/when resolvePromise is called with a value y, run [[Resolve]](promise, y)_
@@ -112,6 +112,27 @@
 
 - 根据第一个更改状态为 fulfilled 或 rejected 的 promise，包装其 value 或 reason 返回新的 promise 对象
 - 第一个之外的其余 promise，将静默执行。
+
+###### Promise.allSettled()
+
+`const promiseAllSettled = Promise.allSettled([promise1, promise2,...promises])`
+
+- 等待待所有实例 promise 都返回结果，不管是 fulfilled 还是 rejected。
+- 最终的 promiseAllSettled.then()只会调用 onFulfilled 方法，即状态只会为 fulfilled。
+
+```js
+if (!Promise.allSettled) {
+  Promise.allSettled = (promises) => {
+    let wrappedPromises = promises.map((p) =>
+      Promise.resolve(p).then(
+        (val) => ({ status: "fulfilled", value: val }),
+        (err) => ({ status: "rejected", reason: err })
+      )
+    );
+    return Promise.all(wrappedPromises);
+  };
+}
+```
 
 ###### Promise 的串行执行
 
