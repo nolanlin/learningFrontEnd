@@ -1,4 +1,3 @@
-// queueMicrotask()需在浏览器端运行
 const PENDING = "pending";
 const FULFILLED = "fulfilled";
 const REJECTED = "rejected";
