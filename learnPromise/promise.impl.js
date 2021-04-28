@@ -49,16 +49,17 @@ class MyPromise {
   }
   then(onFulfilledFn, onRejectedFn) {
     let promise2 = new MyPromise((resolve, reject) => {
+      // onFulfilled 非函数且 promise1 状态是 fulfilled，则 promise2 的状态是 fulfilled 带有 promise1 的 value
       let onFulfilledFnFilter = this.isFunction(onFulfilledFn)
         ? onFulfilledFn
         : (value) => value;
+      // onRejected 非函数且 promise1 状态是 rejected，则 promise2 的状态是 rejected 带有 promise1 的 reason
       let onRejectedFnFilter = this.isFunction(onRejectedFn)
         ? onRejectedFn
         : (reason) => {
             throw reason;
           };
       let fulfilledProgram = () => {
-        // onFulfilled 非函数且 promise1 状态是 fulfilled，则 promise2 的状态是 fulfilled 带有 promise1 的 value
         queueMicrotask(() => {
           // onFulfilled抛异常，则 promise2 的状态是 rejected 且带有 reason
           try {
@@ -70,7 +71,6 @@ class MyPromise {
         });
       };
       let rejectedProgram = () => {
-        // onRejected 非函数且 promise1 状态是 rejected，则 promise2 的状态是 rejected 带有 promise1 的 reason
         queueMicrotask(() => {
           // onRejected 抛异常，则 promise2 的状态是 rejected 且带有 reason
           try {
