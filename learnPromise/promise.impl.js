@@ -144,8 +144,16 @@ class MyPromise {
     return this.then(null, errFn);
   }
   finally(fn) {
-    this.then(fn, fn);
-    return this;
+    if (!this.isFunction(fn)) {
+      return;
+    }
+    return this.then(
+      (value) => MyPromise.resolve(fn()).then(() => value),
+      (reason) =>
+        MyPromise.resolve(fn()).then(() => {
+          throw reason;
+        })
+    );
   }
   objsToPromise(obj) {
     return MyPromise.resolve(obj);
@@ -214,6 +222,60 @@ class MyPromise {
       }
     });
   }
+  static allSettled(objs) {
+    return new MyPromise((resolve, reject) => {
+      const length = objs.length;
+      let count = 0;
+      let resultArray = [];
+      let fulfilledCount = 0;
+      let rejectedCount = 0;
+      let resultFn = () => {
+        if (fulfilledCount + rejectedCount === length) {
+          const finalResultArray = Array.from(resultArray, (obj) => {
+            if (obj.state === FULFILLED) {
+              return { status: obj.state, value: obj.valueOrReason };
+            } else {
+              return { status: obj.state, reason: obj.valueOrReason };
+            }
+          });
+          resolve(finalResultArray);
+        }
+      };
+      let countFn = (index, state, valueOrReason) => {
+        resultArray[index] = { state, valueOrReason };
+        count++;
+        if (state === FULFILLED) {
+          fulfilledCount++;
+        } else if (state === REJECTED) {
+          rejectedCount++;
+        }
+        // 循环结束
+        if (count === length) {
+          resultFn();
+        }
+      };
+      for (let [index, obj] of objs.entries()) {
+        let o = obj;
+        if (
+          !(
+            o !== null &&
+            (typeof o === "function" || typeof o === "object") &&
+            typeof o.then === "function"
+          )
+        ) {
+          o = this.objsToPromise(o);
+        }
+        o.then(
+          (value) => {
+            countFn(index, FULFILLED, value);
+          },
+          (reason) => {
+            countFn(index, REJECTED, reason);
+          }
+        );
+      }
+    });
+  }
 }
 // npm install -g promises-aplus-tests
 // promises-aplus-tests promise.impl.js
@@ -237,18 +299,22 @@ module.exports = {
 
 // const p1 = new MyPromise((s, r) => {
 //   setTimeout(() => {
-//     // console.log("执行1");
-//     s(1);
+//     console.log("执行1");
+//     r(1);
 //   }, 1000);
 // });
+// // p1.then(
+// //   (v) => console.log(v, "fulfilled"),
+// //   (r) => console.log(r, "rejected")
+// // ).finally(() => console.log("finally"));
 // const p2 = new MyPromise((s, r) => {
 //   setTimeout(() => {
 //     // console.log("执行2");
 //     s(2);
 //   }, 500);
 // });
-// const p3 = new MyPromise((s, r) => {});
-// const pAll = MyPromise.all([p1, p2, p3]);
+// const p3 = MyPromise.resolve(23);
+// const pAll = MyPromise.allSettled([p1, p2, p3]);
 // pAll.then(
 //   (v) => console.log(v),
 //   (r) => console.log(r)
