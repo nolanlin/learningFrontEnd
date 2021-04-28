@@ -6,6 +6,8 @@ class MyPromise {
     this._state = PENDING;
     this.value = null;
     this.reason = null;
+    this.onFulfilledCallbackList = [];
+    this.onRejectedCallbackList = [];
     this.thenPendingCallbackList = [];
     try {
       executor(this.resolveFn.bind(this), this.rejectFn.bind(this));
@@ -18,9 +20,14 @@ class MyPromise {
   }
   set state(newState) {
     this._state = newState;
-    this.thenPendingCallbackList.forEach((fnObject) =>
-      this.then(fnObject.onFulfilledFn, fnObject.onRejectedFn)
-    );
+    switch (this._state) {
+      case FULFILLED:
+        this.onFulfilledCallbackList.forEach((fn) => fn());
+        break;
+      case REJECTED:
+        this.onRejectedCallbackList.forEach((fn) => fn());
+        break;
+    }
   }
   resolveFn(value) {
     if (this.state === PENDING) {
@@ -41,103 +48,119 @@ class MyPromise {
     return typeof fn === "object";
   }
   then(onFulfilledFn, onRejectedFn) {
-    // 当executor里的程序是异步时，调用then方法，此时state还是pending，需要存储回调方法。
-    if (this.state === PENDING) {
-      this.thenPendingCallbackList.push({ onFulfilledFn, onRejectedFn });
-    } else {
-      queueMicrotask(() => {
-        const promise2 = new MyPromise((resolve, reject) => {
-          let x = null;
-          if (this.state === FULFILLED) {
-            // onFulfilled 非函数且 promise1 状态是 fulfilled，则 promise2 的状态是 fulfilled 带有 promise1 的 value
-            if (!this.isFunction(onFulfilledFn)) {
-              resolve(this.value);
-            }
-            // onFulfilled抛异常，则 promise2 的状态是 rejected 且带有 reason
-            try {
-              x = onFulfilledFn(this.value);
-            } catch (e) {
-              reject(e);
-            }
+    let promise2 = new MyPromise((resolve, reject) => {
+      let onFulfilledFnFilter = this.isFunction(onFulfilledFn)
+        ? onFulfilledFn
+        : (value) => value;
+      let onRejectedFnFilter = this.isFunction(onRejectedFn)
+        ? onRejectedFn
+        : (reason) => {
+            throw reason;
+          };
+      let fulfilledProgram = () => {
+        // onFulfilled 非函数且 promise1 状态是 fulfilled，则 promise2 的状态是 fulfilled 带有 promise1 的 value
+        queueMicrotask(() => {
+          // onFulfilled抛异常，则 promise2 的状态是 rejected 且带有 reason
+          try {
+            let x = onFulfilledFnFilter(this.value);
             this.promiseResolutionProcedure(promise2, x, resolve, reject);
-          } else if (this.state === REJECTED) {
-            // onRejected 非函数且 promise1 状态是 rejected，则 promise2 的状态是 rejected 带有 promise1 的 reason
-            if (!this.isFunction(onRejectedFn)) {
-              reject(this.reason);
-            }
-            // onRejected 抛异常，则 promise2 的状态是 rejected 且带有 reason
-            try {
-              x = onRejectedFn(this.reason);
-            } catch (e) {
-              reject(e);
-            }
-            this.promiseResolutionProcedure(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
           }
         });
-        return promise2;
-      });
-    }
+      };
+      let rejectedProgram = () => {
+        // onRejected 非函数且 promise1 状态是 rejected，则 promise2 的状态是 rejected 带有 promise1 的 reason
+        queueMicrotask(() => {
+          // onRejected 抛异常，则 promise2 的状态是 rejected 且带有 reason
+          try {
+            let x = onRejectedFnFilter(this.reason);
+            this.promiseResolutionProcedure(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      };
+      switch (this.state) {
+        case FULFILLED:
+          fulfilledProgram();
+          break;
+        case REJECTED:
+          rejectedProgram();
+          break;
+        case PENDING:
+          // 当executor里的程序是异步时，调用then方法，此时state还是pending，需要存储回调方法。
+          this.onFulfilledCallbackList.push(fulfilledProgram);
+          this.onRejectedCallbackList.push(rejectedProgram);
+          break;
+      }
+    });
+    return promise2;
   }
   promiseResolutionProcedure(promise, x, resolve, reject) {
     if (promise === x) {
       reject(new TypeError());
     }
-    if (x && (this.isFunction(x) || this.isObject(x))) {
-      if (typeof x.then === "function") {
-        let called = false;
-        try {
-          let then = x.then;
+    let called;
+    if (x !== null && (this.isFunction(x) || this.isObject(x))) {
+      try {
+        let then = x.then;
+        if (this.isFunction(then)) {
           then.call(
             x,
             (y) => {
               if (called) return;
               called = true;
-              promiseResolutionProcedure(promise, y, resolve, reject);
+              this.promiseResolutionProcedure(x, y, resolve, reject);
             },
             (r) => {
               if (called) return;
               called = true;
-              promiseResolutionProcedure(promise, r, resolve, reject);
+              reject(r);
             }
           );
-        } catch (e) {
-          if (called) return;
-          called = true;
-          reject(e);
+        } else {
+          resolve(x);
         }
-      } else {
-        resolve(x);
+      } catch (e) {
+        if (called) return;
+        called = true;
+        reject(e);
       }
     } else {
       resolve(x);
     }
   }
+  static resolve(value) {
+    return new MyPromise((resolve, reject) => {
+      resolve(value);
+    });
+  }
+  static reject(reason) {
+    return new MyPromise((resolve, reject) => {
+      reject(reason);
+    });
+  }
+  static catch(errFn) {
+    return this.then(null, errFn);
+  }
 }
-const promiseInstance = new MyPromise((resolve, reject) => {
-  setTimeout(() => {
-    console.log(2);
-    resolve(1);
-  }, 0);
-});
-promiseInstance.then(
-  (v) => {
-    console.log(v);
+// npm install -g promises-aplus-tests
+// promises-aplus-tests promise.impl.js
+module.exports = {
+  deferred: () => {
+    let resolve;
+    let reject;
+    const promise = new MyPromise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return {
+      promise,
+      reject,
+      resolve,
+    };
   },
-  (e) => {
-    console.error(e);
-  }
-);
-const promiseInstance2 = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    console.log(2);
-    resolve(1);
-  }, 0);
-});
-promiseInstance2.then(
-  (v) => {
-    console.log(v);
-  },
-  (e) => {
-    console.error(e);
-  }
-);
+  rejected: (reason) => MyPromise.reject(reason),
+  resolved: (value) => MyPromise.resolve(value),
+};
