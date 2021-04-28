@@ -8,7 +8,6 @@ class MyPromise {
     this.reason = null;
     this.onFulfilledCallbackList = [];
     this.onRejectedCallbackList = [];
-    this.thenPendingCallbackList = [];
     try {
       executor(this.resolveFn.bind(this), this.rejectFn.bind(this));
     } catch (e) {
@@ -141,8 +140,79 @@ class MyPromise {
       reject(reason);
     });
   }
-  static catch(errFn) {
+  catch(errFn) {
     return this.then(null, errFn);
+  }
+  finally(fn) {
+    this.then(fn, fn);
+    return this;
+  }
+  objsToPromise(obj) {
+    return MyPromise.resolve(obj);
+  }
+  static all(objs) {
+    return new MyPromise((resolve, reject) => {
+      const length = objs.length;
+      let count = 0;
+      let resultArray = [];
+      let fulfilledCount = 0;
+      let rejectedCount = 0;
+      let firstRejectedIndex = -1;
+      let resultFn = () => {
+        if (fulfilledCount === length && rejectedCount === 0) {
+          // 均为 fulfilled 状态
+          const fulfilledArray = Array.from(resultArray, (obj) => {
+            return obj.valueOrReason;
+          });
+          if (fulfilledArray.length === 1) {
+            resolve(fulfilledArray[0]);
+          } else {
+            resolve(fulfilledArray);
+          }
+        } else if (rejectedCount > 0) {
+          // 至少一个rejected，返回第一个rejected的reason
+          reject(resultArray[firstRejectedIndex].valueOrReason);
+        } else {
+          // 没有rejected，且存在pending，则不处理
+        }
+      };
+      let countFn = (index, state, valueOrReason) => {
+        resultArray[index] = { state, valueOrReason };
+        count++;
+        if (state === FULFILLED) {
+          fulfilledCount++;
+        } else if (state === REJECTED) {
+          if (firstRejectedIndex < 0) {
+            firstRejectedIndex = index;
+          }
+          rejectedCount++;
+        }
+        // 循环结束
+        if (count === length) {
+          resultFn();
+        }
+      };
+      for (let [index, obj] of objs.entries()) {
+        let o = obj;
+        if (
+          !(
+            o !== null &&
+            (typeof o === "function" || typeof o === "object") &&
+            typeof o.then === "function"
+          )
+        ) {
+          o = this.objsToPromise(o);
+        }
+        o.then(
+          (value) => {
+            countFn(index, FULFILLED, value);
+          },
+          (reason) => {
+            countFn(index, REJECTED, reason);
+          }
+        );
+      }
+    });
   }
 }
 // npm install -g promises-aplus-tests
@@ -164,3 +234,22 @@ module.exports = {
   rejected: (reason) => MyPromise.reject(reason),
   resolved: (value) => MyPromise.resolve(value),
 };
+
+// const p1 = new MyPromise((s, r) => {
+//   setTimeout(() => {
+//     // console.log("执行1");
+//     s(1);
+//   }, 1000);
+// });
+// const p2 = new MyPromise((s, r) => {
+//   setTimeout(() => {
+//     // console.log("执行2");
+//     s(2);
+//   }, 500);
+// });
+// const p3 = new MyPromise((s, r) => {});
+// const pAll = MyPromise.all([p1, p2, p3]);
+// pAll.then(
+//   (v) => console.log(v),
+//   (r) => console.log(r)
+// );

@@ -104,7 +104,7 @@
 
 - promise1,promise2,...promises，若不是 Promise 对象，会通过 Promise.resolve()转成 Promise 对象
 - 当且仅当 promise1,promise2,...promises，均为 fulfilled 状态，才会调用 promiseAll.then()的 onFulfilled 回调函数
-- 若 promise1,promise2,...promises，至少有 1 个是 rejected 状态，最终会调用 promiseAll.then()的 onRejected 回调函数
+- 若 promise1,promise2,...promises，至少有 1 个是 rejected 状态，最终会调用 promiseAll.then()的 onRejected 回调函数，且返回第一个 rejected 的 reason
 - 若 promise1,promise2,...promises，均没有 rejected 状态，且至少有 1 个是 pending 状态，则最终不会调用 promiseAll.then()的任何回调函数
 
 ###### Promise.race()
