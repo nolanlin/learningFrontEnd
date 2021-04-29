@@ -3,3 +3,5 @@
 ## [Promise](https://github.com/nolanlin/learningFrontEnd/tree/main/learnPromise/)
 
 ## [Module](https://github.com/nolanlin/learningFrontEnd/tree/main/learnModule)
+
+## [Browser](https://github.com/nolanlin/learningFrontEnd/tree/main/learnBrowser)
