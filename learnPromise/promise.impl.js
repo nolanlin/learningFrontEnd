@@ -276,6 +276,37 @@ class MyPromise {
       }
     });
   }
+  static race(objs) {
+    return new MyPromise((resolve, reject) => {
+      let countFn = (state, valueOrReason) => {
+        if (state === FULFILLED) {
+          resolve(valueOrReason);
+        } else if (state === REJECTED) {
+          reject(valueOrReason);
+        }
+      };
+      for (let obj of objs) {
+        let o = obj;
+        if (
+          !(
+            o !== null &&
+            (typeof o === "function" || typeof o === "object") &&
+            typeof o.then === "function"
+          )
+        ) {
+          o = this.objsToPromise(o);
+        }
+        o.then(
+          (value) => {
+            countFn(FULFILLED, value);
+          },
+          (reason) => {
+            countFn(REJECTED, reason);
+          }
+        );
+      }
+    });
+  }
 }
 // npm install -g promises-aplus-tests
 // promises-aplus-tests promise.impl.js
@@ -316,6 +347,6 @@ module.exports = {
 // const p3 = MyPromise.resolve(23);
 // const pAll = MyPromise.allSettled([p1, p2, p3]);
 // pAll.then(
-//   (v) => console.log(v),
-//   (r) => console.log(r)
+//   (v) => console.log(v, "fulfilled"),
+//   (r) => console.log(r, "rejected")
 // );
