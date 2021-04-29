@@ -22,9 +22,11 @@ class MyPromise {
     switch (this._state) {
       case FULFILLED:
         this.onFulfilledCallbackList.forEach((fn) => fn());
+        this.onFulfilledCallbackList = [];
         break;
       case REJECTED:
         this.onRejectedCallbackList.forEach((fn) => fn());
+        this.onRejectedCallbackList = [];
         break;
     }
   }
