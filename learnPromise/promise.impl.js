@@ -32,8 +32,23 @@ class MyPromise {
   }
   resolveFn(value) {
     if (this.state === PENDING) {
-      this.value = value;
-      this.state = FULFILLED;
+      // this.value = value;
+      // this.state = FULFILLED;
+      const promiseFinish = (promise, self) => {
+        promise.then(
+          (value) => {
+            self.value = value;
+            self.state = FULFILLED;
+          },
+          (reason) => {
+            self.reason = reason;
+            self.state = REJECTED;
+          }
+        );
+      };
+      value instanceof MyPromise
+        ? promiseFinish(value, this)
+        : ((this.value = value), (this.state = FULFILLED));
     }
   }
   rejectFn(reason) {

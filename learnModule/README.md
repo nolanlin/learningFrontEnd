@@ -110,6 +110,52 @@ define(function (require) {
 });
 ```
 
+#### CMD (Common Module Definition)
+
+- 代表人物玉伯，代表技术实现 Sea.js
+
+##### 概念及应用
+
+```js
+// sea.js
+define("a", function (require, exports, module) {
+  console.log("a load");
+  exports.run = function () {
+    console.log("a run");
+  };
+});
+define("b", function (require, exports, module) {
+  console.log("b load");
+  exports.run = function () {
+    console.log("b run");
+  };
+});
+define("main", function (require, exports, module) {
+  console.log("main run");
+  var a = require("a");
+  a.run();
+  var b = require("b");
+  b.run();
+});
+seajs.use("main");
+// main run
+// a load
+// a run
+// b load
+// b run
+```
+
+##### 与 RequireJS 的区别
+
+1. **定位有差异。**RequireJS 想成为浏览器端的模块加载器，同时也想成为 Rhino / Node 等环境的模块加载器。Sea.js 则专注于 Web 浏览器端，同时通过 Node 扩展的方式可以很方便跑在 Node 环境中。
+2. **遵循的规范不同。**RequireJS 遵循 AMD（异步模块定义）规范，Sea.js 遵循 CMD （通用模块定义）规范。规范的不同，导致了两者 API 不同。Sea.js 更贴近 CommonJS Modules/1.1 和 Node Modules 规范。
+3. **推广理念有差异。**RequireJS 在尝试让第三方类库修改自身来支持 RequireJS，目前只有少数社区采纳。Sea.js 不强推，采用自主封装的方式来“海纳百川”，目前已有较成熟的封装策略。
+4. **对开发调试的支持有差异。**Sea.js 非常关注代码的开发调试，有 nocache、debug 等用于调试的插件。RequireJS 无这方面的明显支持。
+5. **插件机制不同。**RequireJS 采取的是在源码中预留接口的形式，插件类型比较单一。Sea.js 采取的是通用事件机制，插件类型更丰富。
+
+- 总之，如果说 RequireJS 是 Prototype 类库的话，则 Sea.js 致力于成为 jQuery 类库。
+  > 以上摘自[与 RequireJS 的异同](https://github.com/seajs/seajs/issues/277)
+
 #### ESModule (EcmaScript Module)
 
 - 从 JS Core 语法层面制定的解释器规范，而浏览器、Node.js 等是在解释器的基础上封装的环境相关的 API，如 global 对象、window 对象等。
