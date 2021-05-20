@@ -70,6 +70,27 @@ var b = " qwe1-rty2 ";
   console.log("trim", a.trim()); // abc1-def2
 }
 
+// 连接
+{
+  console.log("concat", a.concat(b)); //  abc1-def2  qwe1-rty2
+}
+
+// 分割：返回数组
+{
+  console.log("split", a.split("-")); // [ ' abc1', 'def2 ' ]
+}
+
+// 替换
+{
+  // String.prototype.replace(str:string, replaceStr:string)
+  console.log("replace", a.replace("abc", "omg")); //  omg1-def2
+  // String.prototype.replace(str:string, replacer:function)
+  console.log(
+    "replace",
+    a.replace("abc", (v) => v.toUpperCase())
+  ); //  ABC1-def2
+}
+
 // 以上方法均不改变原字符串的值，而是返回一个新的字符串
 console.log(a); //  abc1-def2
 
