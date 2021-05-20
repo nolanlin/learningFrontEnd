@@ -9,4 +9,4 @@
 - [string](https://github.com/nolanlin/learningFrontEnd/tree/main/learnTypeAndValue/learnString.js)
 - [object](https://github.com/nolanlin/learningFrontEnd/tree/main/learnTypeAndValue/learnObject.js)
 - [symbol](https://github.com/nolanlin/learningFrontEnd/tree/main/learnTypeAndValue/learnSymbol.js)
-- [array](https://github.com/nolanlin/learningFrontEnd/tree/main/learnTypeAndValue/learnArray.js), [function](https://github.com/nolanlin/learningFrontEnd/tree/main/learnTypeAndValue/learnFunction.js) 均是 object 的子类型
+- _[array](https://github.com/nolanlin/learningFrontEnd/tree/main/learnTypeAndValue/learnArray.js), [function](https://github.com/nolanlin/learningFrontEnd/tree/main/learnTypeAndValue/learnFunction.js) 均是 object 的子类型_
