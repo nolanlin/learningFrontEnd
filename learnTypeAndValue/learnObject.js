@@ -8,3 +8,5 @@ function objectCreate() {
   const resultObj = constructor.apply(obj, arguments);
   return typeof resultObj === "object" ? resultObj : obj;
 }
+const whitePlayer = objectCreate(Player, "white");
+console.log(whitePlayer);
