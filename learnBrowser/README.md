@@ -1,4 +1,4 @@
-# Browser - 路白
+# Browser - 路白、大巫
 
 ## BOM - Browser Object Model
 
@@ -59,3 +59,17 @@ window.addEventListener(
 - e.preventDefault();
 
 4. IE 兼容性
+
+- [BomEvent](https://github.com/nolanlin/learningFrontEnd/blob/main/learnBrowser/js/BomEvent.js)
+
+5. 从输入 URL 到页面最终的呈现，都发生了什么？
+
+- 1. Prompt for unload. 对前一页进行卸载。
+- 2. Redirect. 发起请求。
+- 3. App cache. 先在浏览器缓存里找 html，再到操作系统下找。
+- 4. DNS. 根据域名查找对应的 IP 地址，到本地 DNS 服务器（电信、联通等）找，再到根 DNS 服务器去查找。
+- 5. TCP/IP. 3 次握手，4 次挥手。
+- 6. Request. HTTP 请求。
+- 7. Response. HTTP 响应。
+- 8. Processing. 文档解析和 DOM 加载。
+- 9. OnLoad. 触发 OnLoad 事件，呈现页面。
