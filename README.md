@@ -11,3 +11,5 @@
 ## [Browser](https://github.com/nolanlin/learningFrontEnd/tree/main/learnBrowser)
 
 ## [微前端](https://github.com/nolanlin/learningFrontEnd/tree/main/learnSingleSpa)
+
+## [算法](https://github.com/nolanlin/learningFrontEnd/tree/main/learnAlgorithm)
