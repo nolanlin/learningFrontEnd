@@ -28,8 +28,12 @@
 
 ## 算法复杂度
 
+- 时间复杂度、空间复杂度
+
 ### 时间复杂度
 
-1.
-2.
-3.
+1. 关注点在循环次数最多的代码块。
+2. 最大值原则 - 存在多个循环，总复杂度等于最大的代码块复杂度。
+3. 乘法原则 - 嵌套代码复杂度等于嵌套内院代码块复杂度的乘积。
+
+- [时间复杂度](https://github.com/nolanlin/learningFrontEnd/tree/main/learnAlgorithm/TimeComplexity.js)
