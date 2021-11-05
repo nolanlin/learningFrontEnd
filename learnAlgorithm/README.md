@@ -2,7 +2,7 @@
 
 ## 数据结构
 
-- 数组、链表、栈、树
+- 数组、链表、栈、队列、哈希、树
 
 ### 数组&链表
 
@@ -10,17 +10,26 @@
 - 插入：数组中元素插入会引起被插入位后所有元素索引的改变，而链表只需要改变某一个节点的 next。
 - [实现链表](https://github.com/nolanlin/learningFrontEnd/tree/main/learnAlgorithm/LinkList.js)：head => node1 => node2 => ... => null
 
-```js
-class LinkList {
-  constructor() {
-    this.length = 0;
-    this.head = null;
-  }
-  getElementAt(position) {} // 返回索引对应的元素
-  append(element) {} // 添加节点
-  insert(position, element) {} // 指定位置添加节点
-  removeAt(position) {} // 删除指定位置的元素
-  indexOf(element) {} // 查找给定元素的索引
-  // ......
-}
-```
+### 栈&队列
+
+- 执行顺序的不同：栈-先入后出，队列-先进先出
+- [实现栈](https://github.com/nolanlin/learningFrontEnd/tree/main/learnAlgorithm/Stack.js)
+
+### 哈希
+
+- 键值对，快速查找定位
+- [哈希](https://github.com/nolanlin/learningFrontEnd/tree/main/learnAlgorithm/Hash.js)
+
+### 树
+
+- 优先广度、优先深度
+- 前序遍历（中左右），中序遍历（左中右），后序遍历（左右中）
+- [树](https://github.com/nolanlin/learningFrontEnd/tree/main/learnAlgorithm/Tree.js)
+
+## 算法复杂度
+
+### 时间复杂度
+
+1.
+2.
+3.
