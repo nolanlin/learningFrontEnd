@@ -124,3 +124,16 @@ plugins:[
 9. yarn add @babel/plugin-transform-runtime -D
 
 - 将使用率高、加载时间长的组件代码独立出去
+
+## 热更新原理
+
+1. 首次启动：
+
+- 源代码 => 编译（compiler） => bundle.js 产物（这里是默认不分割代码的结果） => 浏览器访问端口 => 服务器返回静态资源（html，css，js 等）
+  浏览器与 dev-server 建立 Socket 连接，首次收到 hash（本节课第二张图）
+
+2. 更新：
+
+- 源代码修改 => 增量编译（compiler） => HMR（基于新内容生成[hash].update.js(on)）=> 向浏览器推送消息（'webpackHotUpdate'，包括新的 hash） => 浏览器创建 script 标签下载[hash].update.js('**webpack_require**.l') => 调用页面更新的方法（module.hot.accept）=> 删除 script 标签
+
+## plugins/loaders
